@@ -1,0 +1,276 @@
+{
+  "title": "Amelie 6c",
+  "days": 5,
+  "periodCount": 7,
+  "subjects": [
+    {
+      "id": "fach0",
+      "name": "Mathematik",
+      "color": "#bcd8ff",
+      "abbr": "",
+      "icon": ""
+    },
+    {
+      "id": "fach1",
+      "name": "Deutsch",
+      "color": "#ffc9cb",
+      "abbr": "",
+      "icon": ""
+    },
+    {
+      "id": "fach2",
+      "name": "Englisch",
+      "color": "#ffe6a7",
+      "abbr": "",
+      "icon": ""
+    },
+    {
+      "id": "fach3",
+      "name": "Biologie",
+      "color": "#c6eacb",
+      "abbr": "",
+      "icon": ""
+    },
+    {
+      "id": "fach5",
+      "name": "Sport",
+      "color": "#bce9e9",
+      "abbr": "",
+      "icon": ""
+    },
+    {
+      "id": "fach-1792829161588-r671e",
+      "name": "Musik",
+      "color": "#fff2d5",
+      "abbr": "",
+      "icon": ""
+    },
+    {
+      "id": "fach-1792829172216-hlp5z",
+      "name": "Latein",
+      "color": "#d357fe",
+      "abbr": "",
+      "icon": ""
+    },
+    {
+      "id": "fach-1792829218459-ye26d",
+      "name": "Tutor",
+      "color": "#ff6251",
+      "abbr": "",
+      "icon": ""
+    },
+    {
+      "id": "fach-1792829407153-0rzgn",
+      "name": "Geo",
+      "color": "#aa7942",
+      "abbr": "",
+      "icon": ""
+    },
+    {
+      "id": "fach-1792829504848-h010o",
+      "name": "Kunst",
+      "color": "#4d22b3",
+      "abbr": "",
+      "icon": ""
+    },
+    {
+      "id": "fach-1792829513129-p3qp2",
+      "name": "Ethik",
+      "color": "#fec700",
+      "abbr": "",
+      "icon": ""
+    }
+  ],
+  "times": [
+    {
+      "start": "08:00",
+      "end": "08:45"
+    },
+    {
+      "start": "08:45",
+      "end": "09:30"
+    },
+    {
+      "start": "09:40",
+      "end": "10:30"
+    },
+    {
+      "start": "10:30",
+      "end": "11:20"
+    },
+    {
+      "start": "11:20",
+      "end": "12:10"
+    },
+    {
+      "start": "12:10",
+      "end": "13:00"
+    },
+    {
+      "start": "13:00",
+      "end": "13:50"
+    },
+    {
+      "start": "13:50",
+      "end": "14:40"
+    },
+    {
+      "start": "14:40",
+      "end": "15:30"
+    },
+    {
+      "start": "15:30",
+      "end": "16:20"
+    },
+    {
+      "start": "16:20",
+      "end": "17:10"
+    },
+    {
+      "start": "17:10",
+      "end": "18:00"
+    }
+  ],
+  "slots": {
+    "0-0": {
+      "subjectId": "fach1",
+      "note": ""
+    },
+    "0-1": {
+      "subjectId": "fach1",
+      "note": ""
+    },
+    "0-2": {
+      "subjectId": "fach-1792829161588-r671e",
+      "note": ""
+    },
+    "0-3": {
+      "subjectId": "fach-1792829161588-r671e",
+      "note": ""
+    },
+    "0-4": {
+      "subjectId": "fach-1792829172216-hlp5z",
+      "note": ""
+    },
+    "0-5": {
+      "subjectId": "fach-1792829218459-ye26d",
+      "note": ""
+    },
+    "0-6": {
+      "subjectId": "fach-1792829218459-ye26d",
+      "note": ""
+    },
+    "1-0": {
+      "subjectId": "fach2",
+      "note": ""
+    },
+    "1-1": {
+      "subjectId": "fach2",
+      "note": ""
+    },
+    "1-2": {
+      "subjectId": "fach-1792829172216-hlp5z",
+      "note": ""
+    },
+    "1-3": {
+      "subjectId": "fach-1792829172216-hlp5z",
+      "note": ""
+    },
+    "1-4": {
+      "subjectId": "fach0",
+      "note": ""
+    },
+    "1-5": {
+      "subjectId": "fach1",
+      "note": ""
+    },
+    "2-0": {
+      "subjectId": "fach5",
+      "note": ""
+    },
+    "2-1": {
+      "subjectId": "fach5",
+      "note": ""
+    },
+    "2-2": {
+      "subjectId": "fach0",
+      "note": ""
+    },
+    "2-3": {
+      "subjectId": "fach0",
+      "note": ""
+    },
+    "2-4": {
+      "subjectId": "fach3",
+      "note": ""
+    },
+    "2-5": {
+      "subjectId": "fach3",
+      "note": ""
+    },
+    "3-0": {
+      "subjectId": "fach2",
+      "note": ""
+    },
+    "3-1": {
+      "subjectId": "fach0",
+      "note": ""
+    },
+    "3-3": {
+      "subjectId": "fach-1792829407153-0rzgn",
+      "note": ""
+    },
+    "3-2": {
+      "subjectId": "fach-1792829407153-0rzgn",
+      "note": ""
+    },
+    "3-4": {
+      "subjectId": "fach1",
+      "note": ""
+    },
+    "3-5": {
+      "subjectId": "fach-1792829172216-hlp5z",
+      "note": ""
+    },
+    "4-0": {
+      "subjectId": "fach1",
+      "note": ""
+    },
+    "4-1": {
+      "subjectId": "fach-1792829172216-hlp5z",
+      "note": ""
+    },
+    "4-3": {
+      "subjectId": "fach-1792829513129-p3qp2",
+      "note": ""
+    },
+    "4-2": {
+      "subjectId": "fach-1792829513129-p3qp2",
+      "note": ""
+    },
+    "4-4": {
+      "subjectId": "fach-1792829504848-h010o",
+      "note": ""
+    },
+    "4-5": {
+      "subjectId": "fach-1792829504848-h010o",
+      "note": ""
+    }
+  },
+  "breaks": [
+    {
+      "id": "pause-1792828875103",
+      "after": 2,
+      "name": "Kleine Pause",
+      "start": "09:35",
+      "end": "09:45"
+    },
+    {
+      "id": "pause-1792828895220",
+      "after": 4,
+      "name": "Große Pause",
+      "start": "11:20",
+      "end": "11:20"
+    }
+  ]
+}

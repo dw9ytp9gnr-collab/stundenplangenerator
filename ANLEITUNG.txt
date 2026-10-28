@@ -1,0 +1,18 @@
+STUNDENPLANGENERATOR – iPHONE WEB-APP (PWA)
+
+Die Dateien in diesem Ordner gehören zusammen. Die index.html nicht einzeln hochladen.
+
+1. Kostenloses GitHub-Konto erstellen bzw. anmelden.
+2. Ein neues öffentliches Repository anlegen, z. B. stundenplangenerator.
+3. Alle Dateien dieses Ordners (index.html, sw.js, manifest.webmanifest und drei Icons) ins Repository-Hauptverzeichnis hochladen.
+4. Unter Settings > Pages > Build and deployment > Deploy from a branch > main / (root) > Save aktivieren.
+5. Die HTTPS-Adresse von GitHub Pages auf dem iPhone in Safari öffnen.
+6. Safari: Teilen > Zum Home-Bildschirm > Als Web-App öffnen > Hinzufügen.
+7. Einmal online öffnen und vollständig laden lassen. Anschließend kann die App offline funktionieren.
+
+WICHTIG:
+- Diese App speichert Daten lokal im Browser bzw. in der installierten Web-App, NICHT im GitHub-Repository.
+- Browser und Home-Bildschirm-Web-App können getrennte Datenspeicher haben. Vor Wechsel JSON exportieren und in der installierten App importieren.
+- Regelmäßig JSON-Backups exportieren. iOS kann Website-Daten bei Speichermangel oder durch Löschen der App entfernen.
+- GitHub Pages ist öffentlich: Keine privaten Stundenpläne als Datei ins Repository hochladen. Die App selbst enthält nur Beispielpläne.
+- Lokal per file:// geöffnet ist die HTML-Datei verwendbar, aber keine voll installierte Offline-PWA.

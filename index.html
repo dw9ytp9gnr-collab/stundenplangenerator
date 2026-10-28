@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stundenplangenerator</title>
+<meta name="theme-color" content="#315cec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Stundenplan">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+
+<style>
+:root{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#1c293b;background:#f4f7fb}*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;font-weight:650;background:#e8eef7;color:#23344b}button:hover{filter:brightness(.96)}button.primary{background:#315cec;color:white}button.danger{color:#b43446;background:#ffedf0}button.ghost{background:transparent}input,select{border:1px solid #d3deeb;background:white;border-radius:9px;padding:10px;min-width:0;width:100%}label{font-weight:650;font-size:13px;display:block;margin-bottom:6px}header{background:#fff;border-bottom:1px solid #dde6f1;padding:20px max(20px,calc((100% - 1340px)/2))}header h1{margin:0 0 5px;font-size:26px;letter-spacing:-.8px}header p{margin:0;color:#6b7888;font-size:14px}.shell{max-width:1400px;margin:auto;padding:22px;display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px}.panel{border:1px solid #dce4ee;background:white;border-radius:16px;padding:18px;box-shadow:0 3px 15px #21365308;margin-bottom:16px}.panel h2{font-size:17px;margin:0 0 16px}.hint{font-size:12px;color:#758395}.stack{display:grid;gap:12px}.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}.toolbar .spacer{flex:1}.tablewrap{overflow:auto;border:1px solid #dce4ee;border-radius:14px;background:white}.schedule{border-collapse:separate;border-spacing:0;width:100%;min-width:760px;table-layout:fixed}.schedule th{background:#eef3fa;font-size:13px;padding:14px 8px;border-right:1px solid #dce4ee;border-bottom:1px solid #dce4ee}.schedule th:first-child{width:111px}.schedule td{height:105px;padding:7px;border-right:1px solid #e4eaf1;border-bottom:1px solid #e4eaf1;vertical-align:top}.schedule tr:last-child td{border-bottom:0}.schedule td:last-child,.schedule th:last-child{border-right:0}.period{background:#fafbfd;text-align:center;padding-top:18px!important}.period strong{display:block;font-size:15px}.period small{display:block;white-space:nowrap;color:#718094;font-size:11px;margin-top:6px}.slot{height:100%;width:100%;background:#f7f9fc;color:#8b9aab;border:1px dashed #dce4ee;display:flex;align-items:center;justify-content:center;border-radius:10px}.slot:hover{background:#e9effb;color:#2e58cf}.subject{height:100%;border-radius:10px;padding:12px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;text-align:left;width:100%;color:#19263a;border:2px solid transparent;gap:5px}.subject:hover{border-color:#53667b55}.subject b{font-size:14px;overflow-wrap:anywhere}.subject small{font-size:11px;opacity:.78}.subjectlist{display:grid;gap:8px}.subjectrow{display:flex;align-items:center;gap:8px;border:1px solid #e1e7ef;padding:8px;border-radius:10px}.dot{height:20px;width:20px;flex:none;border-radius:6px}.subjectrow span:nth-child(2){flex:1;overflow-wrap:anywhere;font-size:14px}.iconbtn{padding:6px 8px}.section-heading{margin:18px 0 8px;font-size:13px;color:#718094;letter-spacing:.05em;text-transform:uppercase}.muted{color:#6b7888}.modal-backdrop{position:fixed;inset:0;background:#101a2e9c;display:none;align-items:center;justify-content:center;padding:16px;z-index:10}.modal-backdrop.show{display:flex}.dialog{background:white;border-radius:18px;padding:22px;max-width:420px;width:100%;box-shadow:0 20px 70px #07112644}.dialog h2{margin-top:0}.dialog-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}.alert{margin:0 0 12px;padding:10px;border-radius:10px;background:#e8f8ef;color:#207c47;display:none}.alert.show{display:block}footer{text-align:center;margin:20px 0;color:#8190a0;font-size:12px}@media(max-width:900px){.shell{grid-template-columns:1fr;padding:13px}header{padding:18px}.panel{margin-bottom:10px}}@media print{header,.sidebar,.toolbar,.hint,footer,.alert{display:none!important}.shell{display:block;padding:0}.panel{box-shadow:none;border:0;padding:0}.tablewrap{overflow:visible}.schedule{min-width:0}.schedule td{height:92px}body{background:white}#printTitle{display:block!important}}
+.subjectrow[draggable="true"],.subject[draggable="true"]{cursor:grab;touch-action:pan-y}.subjectrow.dragging,.subject.dragging{opacity:.45}.schedule td.drop-target{outline:3px solid #315cec;outline-offset:-4px;background:#dce8ff!important}.drag-ghost{position:fixed;z-index:100;pointer-events:none;padding:10px 16px;border-radius:10px;box-shadow:0 8px 25px #0003;background:#315cec;color:white;font-weight:bold;max-width:170px}.drag-instructions{color:#315cec;font-weight:600}@media print{.drag-ghost{display:none!important}}
+
+/* Dedicated touch-first day view */
+.mobile-view{display:none}.day-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin;padding:3px 0 10px;scroll-snap-type:x proximity}.day-tab{flex:0 0 auto;min-height:44px;min-width:57px;background:#eef3fa;border:1px solid #dce4ee;scroll-snap-align:start}.day-tab[aria-selected="true"]{background:#315cec;color:white;border-color:#315cec}.mobile-day-heading{font-size:15px;font-weight:750;margin:10px 0 12px}.mobile-lessons{display:grid;gap:10px}.mobile-period{display:grid;grid-template-columns:80px minmax(0,1fr);align-items:stretch;gap:10px;min-height:88px}.mobile-period-info{border-radius:12px;background:#eef3fa;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:8px 4px}.mobile-period-info strong{font-size:14px}.mobile-period-info small{color:#63748c;font-size:11px;line-height:1.5}.mobile-target{border:1px solid #e1e9f2;border-radius:12px;padding:5px;min-width:0}.mobile-target .subject,.mobile-target .slot{min-height:75px;text-align:left;align-items:flex-start;padding:12px}.mobile-target .slot{justify-content:flex-start}.mobile-target.drop-target{outline:3px solid #315cec;outline-offset:-3px;background:#dce8ff}.mobile-nav{display:flex;gap:8px;justify-content:space-between;margin-top:14px}.mobile-nav button{min-height:44px}.mobile-note{font-size:12px;color:#617086;margin:12px 0 0}.mobile-subject-picker{display:flex;gap:8px;margin:13px 0}.mobile-subject-picker select{flex:1}.mobile-subject-picker button{white-space:nowrap}.mobile-period .subject{touch-action:none}.subjectrow{touch-action:pan-y}
+@media(max-width:650px){header{padding:16px}header h1{font-size:23px}.shell{padding:10px;gap:10px}.panel{padding:14px;border-radius:13px}.toolbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar button{min-height:44px;padding:9px}.toolbar .spacer{display:none}.tablewrap{display:none}.mobile-view{display:block}.desktop-hint{display:none}.mobile-day-heading{margin-top:4px}.sidebar{display:flex;flex-direction:column}.sidebar .panel{margin-bottom:10px}.schedule{min-width:760px}}
+@media print{.mobile-view{display:none!important}.tablewrap{display:block!important}.desktop-hint{display:none!important}.schedule{min-width:0!important}}
+#plansPanel select{margin-top:4px}#plansPanel .pair button{min-width:0;font-size:13px;padding:10px 5px}.dialog-actions{flex-wrap:wrap}#pasteLesson:disabled,#copyLesson:disabled{opacity:.45;cursor:not-allowed}@media(max-width:650px){#plansPanel .pair button{min-height:44px}}
+
+.today-card{border:1px solid #cbd9f0;background:linear-gradient(125deg,#f0f6ff,#f9fcff);padding:16px;border-radius:15px;margin:12px 0 20px}.today-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.today-head>div{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.today-head strong{font-size:17px}.today-head span{font-size:13px;color:#64748b}.today-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.today-grid>div{display:grid;gap:4px;padding:13px;border:1px solid #dce6f5;border-radius:12px;background:#fff}.today-grid small{color:#64748b;font-size:12px}.today-grid strong{font-size:16px}.today-grid span{font-size:12px;color:#63748c}.today-card p{margin:10px 0 0}.current-lesson{outline:3px solid #27866a!important;outline-offset:-3px;position:relative}.current-lesson .subject{border:2px solid #27866a!important}.next-lesson{box-shadow:inset 0 0 0 2px #e0a532!important}[data-theme=dark] .today-card{background:linear-gradient(120deg,#263950,#203148);border-color:#4a6588}[data-theme=dark] .today-grid>div{background:#1d2c3f;border-color:#47607b}[data-theme=dark] .today-head span,[data-theme=dark] .today-grid small,[data-theme=dark] .today-grid span{color:#bed0e2}@media(max-width:650px){.today-head{align-items:flex-start}.today-head button{font-size:12px;padding:8px}.today-grid{gap:8px}.today-grid>div{padding:10px}.today-grid strong{font-size:14px}}@media print{.today-card{display:none!important}}
+</style>
+
+<style>
+:root{color-scheme:light;--page:#f3f6fb;--panel:#ffffff;--text:#1c293b;--border:#dae4ef;--soft:#eef3fa;--muted:#62748a}
+body{background:var(--page);color:var(--text)}.panel,header,.tablewrap,.dialog{background:var(--panel);border-color:var(--border)}.panel{box-shadow:0 6px 28px #1427460a}.toolbar button,.toolbar select{min-height:42px}.toolbar button:disabled{opacity:.4;cursor:not-allowed}.export-checkbox{display:flex;gap:6px;align-items:center;font-size:13px;margin:0}.export-checkbox input{width:auto;accent-color:#315cec}
+.break-editor{border:1px solid var(--border);border-radius:12px;padding:11px;background:var(--soft);display:grid;gap:10px}.break-editor .remove-break{justify-self:start}.break-row td{height:46px!important;background:#eaf2fd!important;text-align:center!important;padding:12px!important;color:#315480}.break-row span{margin-left:14px}.mobile-break{border-radius:11px;padding:14px;background:#eaf2fd;text-align:center;color:#315480;font-weight:700;font-size:13px}
+:root[data-theme=dark]{color-scheme:dark;--page:#101827;--panel:#1b283a;--text:#e8eff8;--border:#344761;--soft:#23344b;--muted:#adbbcd;background:var(--page);color:var(--text)}
+[data-theme=dark] header,[data-theme=dark] .tablewrap,[data-theme=dark] .panel,[data-theme=dark] .dialog{background:var(--panel)!important;color:var(--text);border-color:var(--border)}
+[data-theme=dark] input,[data-theme=dark] select,[data-theme=dark] button:not(.subject){background:#26364b;color:#eef4fb;border-color:#485a70}
+[data-theme=dark] button.primary,[data-theme=dark] .day-tab[aria-selected=true]{background:#577cf4;color:white}[data-theme=dark] button.danger{background:#5c303b;color:#ffe0e5}
+[data-theme=dark] .schedule th,[data-theme=dark] .period,[data-theme=dark] .mobile-period-info,[data-theme=dark] .day-tab,[data-theme=dark] .break-row td,[data-theme=dark] .mobile-break{background:#25364a!important;color:#e5eef9}
+[data-theme=dark] .schedule td,[data-theme=dark] .subjectrow,[data-theme=dark] .mobile-target{border-color:var(--border)}[data-theme=dark] .slot{background:#202f43;color:#b4c8df;border-color:#455c74}[data-theme=dark] .hint,[data-theme=dark] header p,[data-theme=dark] .mobile-note,[data-theme=dark] .period small{color:#aebdd1}
+@page{size:A4 landscape;margin:9mm}
+@media print{html,body{background:white!important;color:#172337!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}.schedule td{height:56px!important}.schedule th{padding:8px 4px!important}.subject{padding:5px!important}.subject b{font-size:10px}.subject small{font-size:8px}.break-row td{height:24px!important;padding:4px!important}.panel{background:white!important}.bw-print .subject{background:#f2f2f2!important;border:1px solid #aaa!important}.bw-print .break-row td{background:#eee!important;color:#222!important}.portrait-print .schedule th{font-size:9px}.portrait-print .schedule td{padding:2px}}
+@media(max-width:650px){.toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar select{width:100%!important}.toolbar .export-checkbox{min-height:42px}}
+</style>
+</head>
+<body>
+<header><h1>📚 Stundenplangenerator</h1><p>Fächer verwalten · Stunden planen · lokal speichern · als PDF oder PNG exportieren</p></header>
+<div class="shell">
+<aside class="sidebar">
+<section class="panel" id="plansPanel"><h2>📚 Stundenpläne verwalten</h2><label for="planPicker">Aktiver Stundenplan</label><select id="planPicker" aria-label="Aktiven Stundenplan auswählen"></select><div class="pair" style="margin-top:10px"><button id="newPlan" class="primary" type="button">＋ Neu</button><button id="duplicatePlan" type="button">⧉ Duplizieren</button><button id="renamePlan" type="button">✎ Umbenennen</button><button id="deletePlan" class="danger" type="button">🗑 Löschen</button></div><p class="hint">Jeder Plan hat eigene Fächer, Unterrichtsstunden und Pausen. Alle Pläne werden lokal gespeichert.</p></section><section class="panel"><h2>Mein Stundenplan</h2><div class="stack"><div><label for="planTitle">Name des Stundenplans</label><input id="planTitle" maxlength="80" value="Mein Stundenplan"></div><div class="pair"><div><label for="days">Wochentage</label><select id="days"><option value="5">Mo–Fr</option><option value="6">Mo–Sa</option><option value="7">Mo–So</option></select></div><div><label for="periodCount">Stunden pro Tag</label><select id="periodCount"></select></div></div><button id="clearBtn" class="danger">Stundenplan leeren</button></div></section>
+<section class="panel"><h2>Fächer verwalten</h2><div class="subjectlist" id="subjectList"></div><h3 class="section-heading">Neues Fach</h3><form class="stack" id="subjectForm"><div><label for="newSubject">Fachname</label><input id="newSubject" placeholder="z. B. Mathematik" required maxlength="45"></div><div class="pair"><div><label for="newAbbr">Kürzel (optional)</label><input id="newAbbr" maxlength="8" placeholder="z. B. Ma"></div><div><label for="newIcon">Symbol (optional)</label><input id="newIcon" maxlength="8" placeholder="z. B. 🔢"></div></div><div><label for="newColor">Farbe</label><input id="newColor" type="color" value="#b5d5ff" style="height:42px;padding:4px"></div><button class="primary" type="submit">+ Fach hinzufügen</button></form></section>
+<section class="panel"><h2>Unterrichtszeiten</h2><div class="stack" id="timesList"></div><p class="hint">Zeitangaben erscheinen neben den Unterrichtsstunden und werden gespeichert.</p></section><section class="panel"><h2>☕ Pausen</h2><p class="hint">Pausen erscheinen nach der gewählten Stunde, in beiden Ansichten und im Export.</p><div id="breaksList" class="stack"></div><button id="addBreakBtn" type="button" class="primary" style="margin-top:12px;width:100%">+ Pause hinzufügen</button></section>
+</aside>
+<main><div class="panel"><div class="toolbar"><button id="undoBtn" title="Rückgängig (⌘/Strg+Z)" disabled>↶ Rückgängig</button><button id="redoBtn" title="Wiederherstellen (⌘/Strg+Umschalt+Z)" disabled>↷ Wiederherstellen</button><button id="themeBtn" title="Darstellung wechseln">🌙 Dunkel</button><button class="primary" id="saveBtn">💾 Speichern</button><button id="loadBtn">📂 Laden</button><button id="jsonBtn">⬇ JSON sichern</button><button id="importBtn">⬆ JSON importieren</button><span class="spacer"></span><select id="exportFormat" aria-label="Druckformat" style="width:auto"><option value="landscape">A4 Querformat</option><option value="portrait">A4 Hochformat</option></select><label class="export-checkbox"><input type="checkbox" id="bwExport"> Schwarz-Weiß</label><button id="pngBtn">🖼 PNG</button><button id="pdfBtn">📄 PDF</button></div><div id="alert" class="alert" role="status"></div><h2 id="printTitle" style="display:none"></h2><h2 id="displayTitle"></h2><section class="today-card" id="todayCard" aria-live="polite"><div class="today-head"><div><strong>📅 Heute</strong><span id="todayDate"></span></div><button type="button" id="jumpToday">Heutigen Tag anzeigen</button></div><div class="today-grid"><div><small>Aktuell</small><strong id="nowLesson">–</strong><span id="nowTime"></span></div><div><small>Als Nächstes</small><strong id="nextLesson">–</strong><span id="nextTime"></span></div></div><p id="todayMessage" class="hint"></p></section><div class="tablewrap"><table class="schedule" id="schedule"></table></div><section id="mobileView" class="mobile-view" aria-label="Mobile Tagesansicht"><div class="day-tabs" id="dayTabs" role="tablist" aria-label="Wochentag wählen"></div><div id="mobileDayHeading" class="mobile-day-heading"></div><div class="mobile-subject-picker"><select id="quickSubject" aria-label="Fach für ausgewählte Stunde"><option value="">Fach zum Eintragen wählen</option></select><button id="quickSubjectClear" type="button">Auswahl löschen</button></div><div class="mobile-lessons" id="mobileLessons"></div><div class="mobile-nav"><button id="prevDay" type="button">← Vorheriger Tag</button><button id="nextDay" type="button">Nächster Tag →</button></div><p class="mobile-note">Tippe auf eine Stunde zum Bearbeiten. Wähle oben ein Fach und tippe auf eine Stunde, um es schnell einzutragen. Halte eine belegte Stunde gedrückt und ziehe sie auf eine andere, um sie zu verschieben oder zu tauschen.</p></section><p class="hint desktop-hint">Ziehe ein Fach aus der Fächerliste in ein Feld oder verschiebe belegte Felder per Drag-and-drop. Beim Ablegen auf einem belegten Feld wird dessen Inhalt ersetzt; beim Verschieben werden zwei belegte Felder getauscht. Auf Touchgeräten kannst du ebenfalls ziehen. Klicke auf ein Feld, um es direkt zu bearbeiten. „Speichern“ sichert den Plan in diesem Browser. Über „JSON sichern“ kannst du ihn auf andere Geräte übertragen.</p></div><footer>Alle Daten bleiben lokal auf deinem Gerät. Kein Benutzerkonto, keine Cloud.</footer></main>
+</div>
+<div class="modal-backdrop" id="modal"><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><h2 id="modalTitle">Unterrichtsstunde bearbeiten</h2><div class="stack"><div><label for="modalSubject">Fach</label><select id="modalSubject"></select></div><div><label for="modalNote">Zusatzinfo (optional)</label><input id="modalNote" maxlength="55" placeholder="z. B. Doppelstunde"></div></div><div class="dialog-actions"><button class="danger" id="deleteSlot">Entfernen</button><button id="copyLesson" type="button">⧉ Kopieren</button><button id="pasteLesson" type="button">📋 Einfügen</button><button id="cancelModal">Abbrechen</button><button class="primary" id="confirmModal">Übernehmen</button></div></div></div>
+<input type="file" id="importFile" accept=".json,application/json" hidden>
+<script>
+'use strict';
+const KEY='stundenplangenerator-v1';
+const weekdays=['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'];
+const defaults=[['Mathematik','#bcd8ff'],['Deutsch','#ffc9cb'],['Englisch','#ffe6a7'],['Biologie','#c6eacb'],['Geschichte','#ddcff8'],['Sport','#bce9e9']];
+const defaultTime=i=>{const a=8*60+i*50;return `${String(Math.floor(a/60)).padStart(2,'0')}:${String(a%60).padStart(2,'0')}`};
+const makeDefault=()=>({title:'Mein Stundenplan',days:5,periodCount:8,subjects:defaults.map(([name,color],i)=>({id:'fach'+i,name,color,abbr:'',icon:''})),times:Array.from({length:12},(_,i)=>({start:defaultTime(i),end:defaultTime(i+1)})),slots:{},breaks:[]});
+let data=makeDefault(), selected=null, activeDay=0;
+const $=id=>document.getElementById(id);
+const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hexColor=s=>/^#[0-9a-fA-F]{6}$/.test(s)?s:'#dbeafe';
+const key=(d,p)=>`${d}-${p}`;
+function sanitize(raw){if(!raw||typeof raw!=='object'||!Array.isArray(raw.subjects))throw Error('Ungültiges Stundenplanformat');const result=makeDefault();result.title=String(raw.title||result.title).slice(0,80);result.days=Math.max(5,Math.min(7,Number(raw.days)||5));result.periodCount=Math.max(1,Math.min(12,Number(raw.periodCount)||8));result.subjects=raw.subjects.slice(0,100).filter(s=>s&&typeof s==='object').map((s,i)=>({id:String(s.id||'fach'+i).slice(0,80),name:String(s.name||'Fach').slice(0,45),color:hexColor(s.color),abbr:String(s.abbr||'').trim().slice(0,8),icon:String(s.icon||'').trim().slice(0,8)}));if(Array.isArray(raw.times))raw.times.slice(0,12).forEach((t,i)=>{if(t&&/^\d\d:\d\d$/.test(t.start)&&/^\d\d:\d\d$/.test(t.end))result.times[i]={start:t.start,end:t.end}});result.slots={};for(const [k,v] of Object.entries(raw.slots||{})){if(/^\d{1,2}-\d{1,2}$/.test(k)&&v&&result.subjects.some(s=>s.id===v.subjectId))result.slots[k]={subjectId:String(v.subjectId),note:String(v.note||'').slice(0,55)}}result.breaks=Array.isArray(raw.breaks)?raw.breaks.slice(0,25).filter(b=>b&&Number.isInteger(Number(b.after))&&Number(b.after)>=1&&Number(b.after)<12).map(b=>({id:String(b.id||('pause-'+Math.random())).slice(0,80),after:Number(b.after),name:String(b.name||'Pause').slice(0,40),start:/^\d\d:\d\d$/.test(b.start)?b.start:'09:30',end:/^\d\d:\d\d$/.test(b.end)?b.end:'09:45'})):[];return result}
+function notify(msg){$('alert').textContent=msg;$('alert').classList.add('show');setTimeout(()=>$('alert').classList.remove('show'),4500)}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(data));return true}catch(e){notify('Speichern im Browser nicht verfügbar. Bitte JSON-Datei sichern.');return false}}
+function render(){ $('planTitle').value=data.title;$('days').value=data.days;$('periodCount').value=data.periodCount;$('displayTitle').textContent=data.title;$('printTitle').textContent=data.title;renderSubjects();renderTimes();renderSchedule()}
+function renderSubjects(){const list=$('subjectList');list.innerHTML='';for(const s of data.subjects){const row=document.createElement('div');row.className='subjectrow';row.draggable=true;row.dataset.dragSubject=s.id;row.title='Fach in den Stundenplan ziehen';row.innerHTML=`<span class="dot" style="background:${hexColor(s.color)}"></span><span>${escapeHtml(s.icon||'')} ${escapeHtml(s.name)}${s.abbr?` · ${escapeHtml(s.abbr)}`:''}</span><button class="ghost iconbtn" aria-label="${escapeHtml(s.name)} bearbeiten">✎</button><button class="ghost iconbtn" aria-label="${escapeHtml(s.name)} löschen">✕</button>`;row.children[2].onclick=()=>{const name=prompt('Neuer Fachname:',s.name);if(name===null)return;if(!name.trim())return notify('Der Fachname darf nicht leer sein.');s.name=name.trim().slice(0,45);const color=prompt('Farbe (Hex, z. B. #b5d5ff):',s.color);if(color!==null&&/^#[0-9a-fA-F]{6}$/.test(color))s.color=color;const abbr=prompt('Fachkürzel (max. 8 Zeichen, leer = keines):',s.abbr||'');if(abbr!==null)s.abbr=abbr.trim().slice(0,8);const icon=prompt('Symbol oder Emoji (leer = keines):',s.icon||'');if(icon!==null)s.icon=icon.trim().slice(0,8);persist();render()};row.children[3].onclick=()=>{if(!confirm(`Fach „${s.name}“ und alle seine Einträge entfernen?`))return;data.subjects=data.subjects.filter(x=>x.id!==s.id);for(const [k,v] of Object.entries(data.slots))if(v.subjectId===s.id)delete data.slots[k];persist();render()};list.appendChild(row)}if(!data.subjects.length)list.textContent='Noch keine Fächer angelegt.'}
+function renderTimes(){const container=$('timesList');container.innerHTML='';for(let i=0;i<data.periodCount;i++){const row=document.createElement('div');row.innerHTML=`<label>${i+1}. Stunde</label><div class="pair"><input aria-label="Beginn ${i+1}. Stunde" type="time" value="${data.times[i].start}"><input aria-label="Ende ${i+1}. Stunde" type="time" value="${data.times[i].end}"></div>`;const ins=row.querySelectorAll('input');ins[0].onchange=e=>{data.times[i].start=e.target.value;persist();renderSchedule()};ins[1].onchange=e=>{data.times[i].end=e.target.value;persist();renderSchedule()};container.appendChild(row)}}
+function renderSchedule(){const table=$('schedule');table.innerHTML='';const head=document.createElement('thead');let tr=document.createElement('tr');tr.innerHTML='<th>Stunde / Zeit</th>'+weekdays.slice(0,data.days).map(d=>`<th>${d}</th>`).join('');head.append(tr);table.append(head);const body=document.createElement('tbody');for(let p=0;p<data.periodCount;p++){tr=document.createElement('tr');const period=document.createElement('td');period.className='period';period.innerHTML=`<strong>${p+1}. Stunde</strong><small>${escapeHtml(data.times[p].start)}–${escapeHtml(data.times[p].end)}</small>`;tr.append(period);for(let d=0;d<data.days;d++){const td=document.createElement('td'),slot=data.slots[key(d,p)],sub=slot&&data.subjects.find(s=>s.id===slot.subjectId);const btn=document.createElement('button');if(sub){btn.className='subject';btn.draggable=true;btn.dataset.dragSource=key(d,p);btn.title='Diese Stunde verschieben';btn.style.background=hexColor(sub.color);btn.innerHTML=`<b>${escapeHtml(sub.icon||'')} ${escapeHtml(sub.abbr||sub.name)}</b>${sub.abbr?`<small>${escapeHtml(sub.name)}</small>`:''}${slot.note?`<small>${escapeHtml(slot.note)}</small>`:''}`}else{btn.className='slot';btn.textContent='+'}td.dataset.dropKey=key(d,p);btn.setAttribute('aria-label',`${weekdays[d]}, ${p+1}. Stunde bearbeiten`);btn.onclick=()=>openModal(d,p);td.append(btn);tr.append(td)}body.append(tr)}table.append(body);renderMobileSchedule()}
+// Small-screen daily cards; the same data and drop handler drive both layouts.
+function setActiveDay(d){activeDay=Math.max(0,Math.min(data.days-1,d));renderMobileSchedule()}
+function renderMobileSchedule(){
+ if(activeDay>=data.days)activeDay=data.days-1;
+ const tabs=$('dayTabs');tabs.innerHTML='';
+ for(let d=0;d<data.days;d++){const tab=document.createElement('button');tab.className='day-tab';tab.type='button';tab.setAttribute('role','tab');tab.setAttribute('aria-selected',String(d===activeDay));tab.textContent=weekdays[d].slice(0,2);tab.setAttribute('aria-label',weekdays[d]);tab.onclick=()=>setActiveDay(d);tabs.append(tab)}
+ $('mobileDayHeading').textContent=weekdays[activeDay]+' · '+data.periodCount+' Unterrichtsstunden';
+ const picker=$('quickSubject'),prior=picker.value;
+ picker.innerHTML='<option value="">Fach zum Eintragen wählen</option>'+data.subjects.map(s=>`<option value="${escapeHtml(s.id)}">${escapeHtml(s.icon||'')} ${escapeHtml(s.name)}${s.abbr?' ('+escapeHtml(s.abbr)+')':''}</option>`).join('');
+ if(data.subjects.some(s=>s.id===prior))picker.value=prior;
+ const list=$('mobileLessons');list.innerHTML='';
+ for(let p=0;p<data.periodCount;p++){
+  const slot=data.slots[key(activeDay,p)],sub=slot&&data.subjects.find(s=>s.id===slot.subjectId);
+  const item=document.createElement('div');item.className='mobile-period';
+  const info=document.createElement('div');info.className='mobile-period-info';info.innerHTML=`<strong>${p+1}. Stunde</strong><small>${escapeHtml(data.times[p].start)}<br>– ${escapeHtml(data.times[p].end)}</small>`;
+  const target=document.createElement('div');target.className='mobile-target';target.dataset.dropKey=key(activeDay,p);
+  const btn=document.createElement('button');btn.type='button';
+  if(sub){btn.className='subject';btn.draggable=true;btn.dataset.dragSource=key(activeDay,p);btn.style.background=hexColor(sub.color);btn.innerHTML=`<b>${escapeHtml(sub.icon||'')} ${escapeHtml(sub.abbr||sub.name)}</b>${sub.abbr?`<small>${escapeHtml(sub.name)}</small>`:''}${slot.note?`<small>${escapeHtml(slot.note)}</small>`:''}`}
+  else{btn.className='slot';btn.textContent='+ Stunde belegen'}
+  btn.setAttribute('aria-label',weekdays[activeDay]+', '+(p+1)+'. Stunde bearbeiten');
+  const day=activeDay,period=p;
+  btn.onclick=()=>{const chosen=picker.value;if(chosen){applyDrop({kind:'subject',id:chosen},key(day,period))}else openModal(day,period)};
+  target.append(btn);item.append(info,target);list.append(item)
+ }
+ $('prevDay').disabled=activeDay===0;$('nextDay').disabled=activeDay===data.days-1;
+}
+$('prevDay').onclick=()=>setActiveDay(activeDay-1);
+$('nextDay').onclick=()=>setActiveDay(activeDay+1);
+$('quickSubjectClear').onclick=()=>{$('quickSubject').value=''};
+// Drag-and-drop: copy from the subject list; move or swap existing lessons.
+let dragPayload=null,skipNextClick=false;
+function applyDrop(payload,target){
+ if(!payload||!/^\d{1,2}-\d{1,2}$/.test(target))return;
+ const [d,p]=target.split('-').map(Number);if(d>=data.days||p>=data.periodCount)return;
+ if(payload.kind==='subject'){
+  if(!data.subjects.some(s=>s.id===payload.id))return;
+  data.slots[target]={subjectId:payload.id,note:''};
+ }else if(payload.kind==='slot'){
+  const from=payload.from;if(from===target||!data.slots[from])return;
+  const old=data.slots[target];data.slots[target]=data.slots[from];
+  if(old)data.slots[from]=old;else delete data.slots[from];
+ }else return;
+ persist();renderSchedule();
+}
+function payloadFrom(el){const subject=el.closest('[data-drag-subject]');if(subject&&!el.closest('button'))return {kind:'subject',id:subject.dataset.dragSubject};const slot=el.closest('[data-drag-source]');if(slot)return {kind:'slot',from:slot.dataset.dragSource};return null}
+document.addEventListener('dragstart',e=>{const payload=payloadFrom(e.target);if(!payload){if(e.target.closest('.subjectrow'))e.preventDefault();return}dragPayload=payload;e.dataTransfer.effectAllowed=payload.kind==='slot'?'move':'copy';e.dataTransfer.setData('text/plain',JSON.stringify(payload));e.target.classList.add('dragging')});
+document.addEventListener('dragover',e=>{const cell=e.target.closest('[data-drop-key]');document.querySelectorAll('.drop-target').forEach(x=>x.classList.remove('drop-target'));if(cell&&dragPayload){e.preventDefault();e.dataTransfer.dropEffect=dragPayload.kind==='slot'?'move':'copy';cell.classList.add('drop-target')}});
+document.addEventListener('drop',e=>{const cell=e.target.closest('[data-drop-key]');if(cell&&dragPayload){e.preventDefault();applyDrop(dragPayload,cell.dataset.dropKey)}dragPayload=null;document.querySelectorAll('.drop-target').forEach(x=>x.classList.remove('drop-target'))});
+document.addEventListener('dragend',()=>{dragPayload=null;document.querySelectorAll('.dragging,.drop-target').forEach(x=>x.classList.remove('dragging','drop-target'))});
+// Touch support on iPad/iPhone: start moving only after a 9px threshold.
+let touchDrag=null;
+document.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;const origin=e.target.closest('[data-drag-subject],[data-drag-source]');if(!origin||e.target.closest('.subjectrow button'))return;const payload=payloadFrom(e.target);if(!payload)return;const t=e.touches[0];touchDrag={payload,x:t.clientX,y:t.clientY,active:false,origin};},{passive:true});
+document.addEventListener('touchmove',e=>{if(!touchDrag||e.touches.length!==1)return;const t=e.touches[0],a=touchDrag;if(!a.active&&Math.hypot(t.clientX-a.x,t.clientY-a.y)<9)return;if(!a.active){a.active=true;a.ghost=document.createElement('div');a.ghost.className='drag-ghost';a.ghost.textContent=a.payload.kind==='subject'?(data.subjects.find(s=>s.id===a.payload.id)?.name||'Fach'):(a.origin.querySelector('b')?.textContent||'Stunde');document.body.append(a.ghost)}e.preventDefault();a.ghost.style.left=(t.clientX+12)+'px';a.ghost.style.top=(t.clientY+12)+'px';document.querySelectorAll('.drop-target').forEach(x=>x.classList.remove('drop-target'));document.elementFromPoint(t.clientX,t.clientY)?.closest('[data-drop-key]')?.classList.add('drop-target');},{passive:false});
+document.addEventListener('touchend',e=>{if(!touchDrag)return;const a=touchDrag;touchDrag=null;if(a.active){const t=e.changedTouches[0],cell=document.elementFromPoint(t.clientX,t.clientY)?.closest('[data-drop-key]');a.ghost?.remove();document.querySelectorAll('.drop-target').forEach(x=>x.classList.remove('drop-target'));if(cell)applyDrop(a.payload,cell.dataset.dropKey);skipNextClick=true;setTimeout(()=>skipNextClick=false,400)}},{passive:true});
+document.addEventListener('touchcancel',()=>{touchDrag?.ghost?.remove();touchDrag=null;document.querySelectorAll('.drop-target').forEach(x=>x.classList.remove('drop-target'))});
+document.addEventListener('click',e=>{if(skipNextClick){e.preventDefault();e.stopImmediatePropagation();skipNextClick=false}},true);
+function openModal(d,p){selected={d,p};const slot=data.slots[key(d,p)];$('modalSubject').innerHTML='<option value="">— Frei —</option>'+data.subjects.map(s=>`<option value="${escapeHtml(s.id)}">${escapeHtml(s.icon||'')} ${escapeHtml(s.name)}${s.abbr?' ('+escapeHtml(s.abbr)+')':''}</option>`).join('');$('modalSubject').value=slot?.subjectId||'';$('modalNote').value=slot?.note||'';$('modalTitle').textContent=`${weekdays[d]} · ${p+1}. Stunde`;$('modal').classList.add('show');$('modalSubject').focus()}
+function closeModal(){$('modal').classList.remove('show');selected=null}
+$('confirmModal').onclick=()=>{if(!selected)return;const k=key(selected.d,selected.p),id=$('modalSubject').value;if(id&&data.subjects.some(s=>s.id===id))data.slots[k]={subjectId:id,note:$('modalNote').value.trim().slice(0,55)};else delete data.slots[k];persist();renderSchedule();closeModal()};
+$('deleteSlot').onclick=()=>{if(!selected)return;delete data.slots[key(selected.d,selected.p)];persist();renderSchedule();closeModal()};$('cancelModal').onclick=closeModal;$('modal').onclick=e=>{if(e.target===$('modal'))closeModal()};document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+$('subjectForm').onsubmit=e=>{e.preventDefault();const name=$('newSubject').value.trim();if(!name)return;if(data.subjects.some(s=>s.name.toLowerCase()===name.toLowerCase()))return notify('Dieses Fach gibt es bereits.');data.subjects.push({id:'fach-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),name,color:$('newColor').value,abbr:$('newAbbr').value.trim().slice(0,8),icon:$('newIcon').value.trim().slice(0,8)});$('newSubject').value='';$('newAbbr').value='';$('newIcon').value='';persist();renderSubjects();renderSchedule()};
+$('planTitle').oninput=e=>{data.title=e.target.value.slice(0,80);$('displayTitle').textContent=data.title;$('printTitle').textContent=data.title;persist()};$('days').onchange=e=>{data.days=Number(e.target.value);persist();renderSchedule()};$('periodCount').onchange=e=>{data.periodCount=Number(e.target.value);persist();renderTimes();renderSchedule()};
+$('saveBtn').onclick=()=>{if(persist())notify('Stundenplan lokal gespeichert.')};$('loadBtn').onclick=()=>{try{const saved=localStorage.getItem(KEY);if(!saved)return notify('Kein gespeicherter Stundenplan vorhanden.');data=sanitize(JSON.parse(saved));render();notify('Stundenplan geladen.')}catch(e){notify('Gespeicherter Stundenplan konnte nicht geladen werden.')}};
+$('clearBtn').onclick=()=>{if(confirm('Alle eingetragenen Unterrichtsstunden löschen? (Die Fächer bleiben erhalten.)')){data.slots={};persist();renderSchedule()}};
+function download(blob,name){const a=document.createElement('a');const u=URL.createObjectURL(blob);a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),3000)}
+const filename=()=>((data.title||'stundenplan').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9_-]+/g,'-').replace(/^-|-$/g,'')||'stundenplan');
+$('jsonBtn').onclick=()=>download(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),filename()+'.json');$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{data=sanitize(JSON.parse(await file.text()));persist();render();notify('Stundenplan aus JSON importiert.')}catch(err){notify('Datei ungültig: '+err.message)}e.target.value=''};
+// Printable output is drawn on a Canvas so PNG export needs no outside library.
+function makeCanvas(){const W=1680,pad=42,titleH=112,headerH=70,rowH=128,firstCol=172,colW=(W-2*pad-firstCol)/data.days,H=titleH+headerH+data.periodCount*rowH+pad;const c=document.createElement('canvas');c.width=W*2;c.height=H*2;const ctx=c.getContext('2d');ctx.scale(2,2);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);ctx.fillStyle='#1c293b';ctx.font='bold 38px Arial';ctx.fillText(data.title||'Stundenplan',pad,69);const y0=titleH;ctx.fillStyle='#eef3fa';ctx.fillRect(pad,y0,W-pad*2,headerH);ctx.textAlign='center';ctx.font='bold 20px Arial';ctx.fillStyle='#334155';ctx.fillText('Stunde / Zeit',pad+firstCol/2,y0+42);weekdays.slice(0,data.days).forEach((day,d)=>ctx.fillText(day,pad+firstCol+(d+.5)*colW,y0+42));for(let p=0;p<data.periodCount;p++){const y=y0+headerH+p*rowH;ctx.fillStyle=p%2?'#fafbfe':'#fff';ctx.fillRect(pad,y,W-pad*2,rowH);ctx.fillStyle='#eef3fa';ctx.fillRect(pad,y,firstCol,rowH);ctx.fillStyle='#23344b';ctx.font='bold 23px Arial';ctx.fillText((p+1)+'. Stunde',pad+firstCol/2,y+50);ctx.font='17px Arial';ctx.fillStyle='#6b7888';ctx.fillText(data.times[p].start+' – '+data.times[p].end,pad+firstCol/2,y+81);for(let d=0;d<data.days;d++){const v=data.slots[key(d,p)],s=v&&data.subjects.find(x=>x.id===v.subjectId);if(!s)continue;const x=pad+firstCol+d*colW;ctx.fillStyle=hexColor(s.color);ctx.beginPath();ctx.roundRect(x+8,y+8,colW-16,rowH-16,12);ctx.fill();ctx.fillStyle='#1c293b';ctx.textAlign='center';const maxW=colW-30;const lines=wrapText(ctx,(s.icon?s.icon+' ':'')+(s.abbr||s.name),maxW,'bold 21px Arial');let startY=y+(v.note?49:rowH/2)-((lines.length-1)*13);ctx.font='bold 21px Arial';lines.slice(0,3).forEach((line,i)=>ctx.fillText(line,x+colW/2,startY+i*26));if(v.note){ctx.font='15px Arial';wrapText(ctx,v.note,maxW,'15px Arial').slice(0,2).forEach((line,i)=>ctx.fillText(line,x+colW/2,y+93+i*18))}}ctx.textAlign='center'}ctx.strokeStyle='#dae3ee';ctx.lineWidth=1;const xEnd=W-pad,yEnd=y0+headerH+data.periodCount*rowH;for(let d=0;d<=data.days;d++){const x=pad+firstCol+d*colW;ctx.beginPath();ctx.moveTo(x,y0);ctx.lineTo(x,yEnd);ctx.stroke()}ctx.beginPath();ctx.moveTo(pad,y0);ctx.lineTo(pad,yEnd);ctx.moveTo(xEnd,y0);ctx.lineTo(xEnd,yEnd);ctx.stroke();for(let p=0;p<=data.periodCount;p++){const y=y0+headerH+p*rowH;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(xEnd,y);ctx.stroke()}return c}
+function wrapText(ctx,str,maxWidth,font){ctx.font=font;const words=String(str).split(/\s+/);const lines=[];let line='';for(const w of words){if(ctx.measureText(w).width>maxWidth){if(line){lines.push(line);line=''}let bit='';for(const ch of w){if(ctx.measureText(bit+ch).width>maxWidth&&bit){lines.push(bit);bit=ch}else bit+=ch}line=bit;continue}if(ctx.measureText(line+(line?' ':'')+w).width>maxWidth&&line){lines.push(line);line=w}else line+=(line?' ':'')+w}if(line)lines.push(line);return lines}
+$('pngBtn').onclick=()=>{makeCanvas().toBlob(blob=>{if(blob)download(blob,filename()+'.png');else notify('PNG konnte nicht erzeugt werden.')},'image/png')};
+// PDF export uses the browser's native "Save as PDF" printing, avoiding external libraries.
+$('pdfBtn').onclick=()=>{window.print()};
+// Erweiterung: Verlauf, Pausen, Darstellung und Export. Kompatibel mit älteren JSON-Dateien.
+const historyBack=[],historyForward=[];
+let lastSnapshot=JSON.stringify(data),restoring=false;
+const originalPersist=persist;
+function updateHistoryButtons(){ $('undoBtn').disabled=!historyBack.length;$('redoBtn').disabled=!historyForward.length; }
+persist=function(){
+ const next=JSON.stringify(data);
+ if(!restoring&&next!==lastSnapshot){historyBack.push(lastSnapshot);if(historyBack.length>80)historyBack.shift();historyForward.length=0;}
+ lastSnapshot=next;updateHistoryButtons();return originalPersist();
+};
+function restoreSnapshot(snapshot){restoring=true;data=sanitize(JSON.parse(snapshot));lastSnapshot=JSON.stringify(data);originalPersist();restoring=false;render();updateHistoryButtons()}
+function undo(){if(!historyBack.length)return;historyForward.push(JSON.stringify(data));restoreSnapshot(historyBack.pop());notify('Änderung rückgängig gemacht.')}
+function redo(){if(!historyForward.length)return;historyBack.push(JSON.stringify(data));restoreSnapshot(historyForward.pop());notify('Änderung wiederhergestellt.')}
+$('undoBtn').onclick=undo;$('redoBtn').onclick=redo;
+document.addEventListener('keydown',e=>{if(!(e.ctrlKey||e.metaKey)||e.altKey)return;if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)||document.activeElement?.isContentEditable)return;if(e.key.toLowerCase()==='z'){e.preventDefault();if(e.shiftKey)redo();else undo()}else if(e.key.toLowerCase()==='y'){e.preventDefault();redo()}});
+function normalizedBreaks(){return (data.breaks||[]).filter(b=>b.after>=1&&b.after<data.periodCount).sort((a,b)=>a.after-b.after)}
+function renderBreaks(){const root=$('breaksList');root.innerHTML='';(data.breaks||[]).forEach((b,idx)=>{const wrap=document.createElement('div');wrap.className='break-editor';wrap.innerHTML=`<div class="pair"><div><label>Nach Stunde</label><select class="bafter">${Array.from({length:Math.max(0,data.periodCount-1)},(_,i)=>`<option value="${i+1}">${i+1}. Stunde</option>`).join('')}</select></div><div><label>Bezeichnung</label><input class="bname" maxlength="40" value="${escapeHtml(b.name)}"></div></div><div class="pair"><div><label>Beginn</label><input class="bstart" type="time" value="${escapeHtml(b.start)}"></div><div><label>Ende</label><input class="bend" type="time" value="${escapeHtml(b.end)}"></div></div><button type="button" class="danger remove-break">Pause entfernen</button>`;wrap.querySelector('.bafter').value=b.after;for(const [selector,prop] of [['.bafter','after'],['.bname','name'],['.bstart','start'],['.bend','end']])wrap.querySelector(selector).addEventListener('change',e=>{b[prop]=prop==='after'?Number(e.target.value):e.target.value;persist();renderSchedule()});wrap.querySelector('.remove-break').onclick=()=>{data.breaks.splice(idx,1);persist();renderBreaks();renderSchedule()};root.append(wrap)});$('addBreakBtn').disabled=data.periodCount<=1;}
+$('addBreakBtn').onclick=()=>{if(data.periodCount<=1)return;data.breaks??=[];const after=Math.max(1,Math.min(data.periodCount-1,Math.round(data.periodCount/2)));data.breaks.push({id:'pause-'+Date.now(),after,name:'Große Pause',start:data.times[after-1].end,end:data.times[after]?.start||data.times[after-1].end});persist();renderBreaks();renderSchedule()};
+const baseRender=render;render=function(){baseRender();renderBreaks()};
+const baseMobileRender=renderMobileSchedule;
+renderMobileSchedule=function(){baseMobileRender();const items=[...$('mobileLessons').children];for(const b of normalizedBreaks()){const el=document.createElement('div');el.className='mobile-break';el.textContent='☕ '+b.name+' · '+b.start+'–'+b.end;items[b.after-1]?.after(el)}};
+const baseSchedule=renderSchedule;
+renderSchedule=function(){baseSchedule();const body=$('schedule').tBodies[0];const rows=[...body.rows];for(const b of normalizedBreaks()){const tr=document.createElement('tr');tr.className='break-row';const td=document.createElement('td');td.colSpan=data.days+1;td.innerHTML=`☕ <strong>${escapeHtml(b.name)}</strong> <span>${escapeHtml(b.start)}–${escapeHtml(b.end)}</span>`;tr.append(td);rows[b.after-1]?.after(tr)}};
+const originalPeriodCount=$('periodCount').onchange;
+$('periodCount').onchange=e=>{originalPeriodCount(e);renderBreaks()};
+const themeKey='stundenplangenerator-theme';
+function applyTheme(dark){document.documentElement.dataset.theme=dark?'dark':'light';$('themeBtn').textContent=dark?'☀️ Hell':'🌙 Dunkel';try{localStorage.setItem(themeKey,dark?'dark':'light')}catch(e){}}
+$('themeBtn').onclick=()=>applyTheme(document.documentElement.dataset.theme!=='dark');
+try{applyTheme(localStorage.getItem(themeKey)==='dark'||(!localStorage.getItem(themeKey)&&matchMedia('(prefers-color-scheme: dark)').matches))}catch(e){applyTheme(false)}
+// Export aus derselben Datenbasis wie die Tabelle; Pausen werden zusätzlich gezeichnet.
+makeCanvas=function(){
+ const portrait=$('exportFormat').value==='portrait',bw=$('bwExport').checked;
+ const W=portrait?1180:1680,pad=36,first=portrait?132:170,head=110,rowH=portrait?106:126,breakH=48,headerH=65;
+ const breaks=normalizedBreaks(),H=head+headerH+data.periodCount*rowH+breaks.length*breakH+pad;
+ const canvas=document.createElement('canvas');canvas.width=W*2;canvas.height=H*2;const ctx=canvas.getContext('2d');ctx.scale(2,2);
+ ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);ctx.textAlign='left';ctx.font='bold 34px Arial';ctx.fillStyle='#18283c';ctx.fillText(data.title||'Stundenplan',pad,65);
+ const col=(W-2*pad-first)/data.days;let y=head;
+ ctx.fillStyle='#eaf0f7';ctx.fillRect(pad,y,W-2*pad,headerH);ctx.fillStyle='#26364b';ctx.font='bold 18px Arial';ctx.textAlign='center';ctx.fillText('Stunde / Zeit',pad+first/2,y+40);weekdays.slice(0,data.days).forEach((day,d)=>ctx.fillText(portrait?day.slice(0,2):day,pad+first+(d+.5)*col,y+40));y+=headerH;
+ for(let p=0;p<data.periodCount;p++){
+  ctx.fillStyle=p%2?'#f8fafc':'#fff';ctx.fillRect(pad,y,W-2*pad,rowH);ctx.fillStyle='#edf2f8';ctx.fillRect(pad,y,first,rowH);ctx.fillStyle='#22344d';ctx.font=`bold ${portrait?16:22}px Arial`;ctx.fillText((p+1)+'. Stunde',pad+first/2,y+46);ctx.font=`${portrait?12:16}px Arial`;ctx.fillText(data.times[p].start+' – '+data.times[p].end,pad+first/2,y+73);
+  for(let d=0;d<data.days;d++){const v=data.slots[key(d,p)],sub=v&&data.subjects.find(a=>a.id===v.subjectId);if(!sub)continue;const x=pad+first+d*col;ctx.fillStyle=bw?'#f4f4f4':hexColor(sub.color);ctx.fillRect(x+4,y+5,col-8,rowH-10);ctx.fillStyle='#152337';ctx.font=`bold ${portrait?15:21}px Arial`;wrapText(ctx,(sub.icon?sub.icon+' ':'')+(sub.abbr||sub.name),col-16,ctx.font).slice(0,3).forEach((line,i)=>ctx.fillText(line,x+col/2,y+38+i*22));if(v.note){ctx.font=`${portrait?11:14}px Arial`;wrapText(ctx,v.note,col-14,ctx.font).slice(0,2).forEach((line,i)=>ctx.fillText(line,x+col/2,y+rowH-26+i*15))}}
+  ctx.strokeStyle='#d2dbe7';ctx.strokeRect(pad,y,W-2*pad,rowH);for(let d=0;d<=data.days;d++){ctx.beginPath();ctx.moveTo(pad+first+d*col,y);ctx.lineTo(pad+first+d*col,y+rowH);ctx.stroke()}y+=rowH;
+  for(const b of breaks.filter(b=>b.after===p+1)){ctx.fillStyle='#edf2f6';ctx.fillRect(pad,y,W-2*pad,breakH);ctx.textAlign='center';ctx.fillStyle='#394c63';ctx.font='bold 18px Arial';ctx.fillText(b.name+'  ·  '+b.start+'–'+b.end,W/2,y+31);y+=breakH;}
+ }return canvas;
+};
+const oldPNG=$('pngBtn').onclick;
+$('pngBtn').onclick=()=>{try{oldPNG()}catch(e){notify('PNG-Export fehlgeschlagen: '+e.message)}};
+const printPageStyle=document.createElement('style');document.head.append(printPageStyle);
+$('pdfBtn').onclick=()=>{printPageStyle.textContent='@page{size:A4 '+($('exportFormat').value==='portrait'?'portrait':'landscape')+';margin:9mm}';document.body.classList.toggle('bw-print',$('bwExport').checked);document.body.classList.toggle('portrait-print',$('exportFormat').value==='portrait');window.print()};
+// Load and import are existing handlers, reset history after a file is loaded.
+const oldLoad=$('loadBtn').onclick;$('loadBtn').onclick=()=>{oldLoad();lastSnapshot=JSON.stringify(data);historyBack.length=0;historyForward.length=0;updateHistoryButtons()};
+const importField=$('importFile'),oldImport=importField.onchange;importField.onchange=async e=>{await oldImport(e);lastSnapshot=JSON.stringify(data);historyBack.length=0;historyForward.length=0;updateHistoryButtons()};
+
+for(let i=1;i<=12;i++)$('periodCount').add(new Option(i+' Stunden',String(i)));
+try{const saved=localStorage.getItem(KEY);if(saved)data=sanitize(JSON.parse(saved))}catch(e){}lastSnapshot=JSON.stringify(data);render();updateHistoryButtons();
+// Multi-plan storage, with migration of the original single-plan key.
+const PLANS_KEY='stundenplangenerator-plan-collection-v2';
+let planCollection, activePlanId;
+const createPlanId=()=>('plan-'+Date.now()+'-'+Math.random().toString(36).slice(2,10));
+function saveCollection(){
+  planCollection.activeId=activePlanId;
+  const current=planCollection.plans.find(p=>p.id===activePlanId);
+  if(current)current.data=sanitize(data);
+  try{localStorage.setItem(PLANS_KEY,JSON.stringify(planCollection));return true}
+  catch(e){notify('Speicher voll: Bitte JSON-Backup erstellen.');return false}
+}
+function initializeCollection(){
+  try{
+    const raw=JSON.parse(localStorage.getItem(PLANS_KEY)||'null');
+    if(raw&&Array.isArray(raw.plans)&&raw.plans.length){
+      const unique=new Set();
+      const plans=raw.plans.slice(0,100).map(p=>({id:String(p.id||createPlanId()),data:sanitize(p.data)})).filter(p=>{if(unique.has(p.id))return false;unique.add(p.id);return true});
+      if(plans.length){planCollection={plans,activeId:String(raw.activeId||'')};activePlanId=plans.some(p=>p.id===planCollection.activeId)?planCollection.activeId:plans[0].id;data=sanitize(plans.find(p=>p.id===activePlanId).data);return}
+    }
+  }catch(e){notify('Mehrere Pläne konnten nicht geladen werden; bisheriger Plan bleibt erhalten.')}
+  activePlanId=createPlanId();planCollection={activeId:activePlanId,plans:[{id:activePlanId,data:sanitize(data)}]};
+  saveCollection();
+}
+function renderPlanPicker(){
+  const picker=$('planPicker');picker.innerHTML='';
+  planCollection.plans.forEach(p=>picker.add(new Option(p.data.title||'Unbenannter Stundenplan',p.id)));
+  picker.value=activePlanId;
+  $('deletePlan').disabled=planCollection.plans.length<2;
+}
+function clearPlanHistory(){historyBack.length=0;historyForward.length=0;lastSnapshot=JSON.stringify(data);updateHistoryButtons()}
+function switchPlan(id){
+  if(id===activePlanId)return;
+  const next=planCollection.plans.find(p=>p.id===id);if(!next)return;
+  saveCollection();
+  activePlanId=id;data=sanitize(next.data);selected=null;closeModal();
+  originalPersist();clearPlanHistory();render();renderPlanPicker();saveCollection();
+  notify('Stundenplan gewechselt.');
+}
+initializeCollection();
+const persistBeforePlans=persist;
+persist=function(){const ok=persistBeforePlans();saveCollection();renderPlanPicker();return ok};
+// Make undo/redo persist the restored revision to the active plan.
+const originalRestoreSnapshot=restoreSnapshot;
+restoreSnapshot=function(snapshot){originalRestoreSnapshot(snapshot);saveCollection();renderPlanPicker()};
+$('planPicker').onchange=e=>switchPlan(e.target.value);
+$('newPlan').onclick=()=>{
+  const input=prompt('Name des neuen Stundenplans:', 'Neuer Stundenplan');if(input===null)return;
+  const title=input.trim().slice(0,80);if(!title)return notify('Bitte einen Namen eingeben.');
+  saveCollection();const fresh=makeDefault();fresh.title=title;
+  const id=createPlanId();planCollection.plans.push({id,data:fresh});switchPlan(id);
+};
+$('duplicatePlan').onclick=()=>{
+  const input=prompt('Name der Kopie:',(data.title||'Stundenplan')+' (Kopie)');if(input===null)return;
+  const name=input.trim().slice(0,80);if(!name)return notify('Bitte einen Namen eingeben.');
+  saveCollection();const copy=sanitize(data);copy.title=name;const id=createPlanId();planCollection.plans.push({id,data:copy});switchPlan(id);
+};
+$('renamePlan').onclick=()=>{
+  const input=prompt('Stundenplan umbenennen:',data.title);if(input===null)return;
+  const name=input.trim().slice(0,80);if(!name)return notify('Bitte einen Namen eingeben.');
+  data.title=name;persist();render();notify('Stundenplan umbenannt.');
+};
+$('deletePlan').onclick=()=>{
+  if(planCollection.plans.length===1)return notify('Mindestens ein Stundenplan muss vorhanden sein.');
+  if(!confirm('Stundenplan „'+data.title+'“ endgültig löschen?'))return;
+  const oldId=activePlanId;
+  planCollection.plans=planCollection.plans.filter(p=>p.id!==oldId);
+  activePlanId=planCollection.plans[0].id;
+  data=sanitize(planCollection.plans[0].data);originalPersist();clearPlanHistory();render();renderPlanPicker();saveCollection();notify('Stundenplan gelöscht.');
+};
+// Keep selection + notes in a local in-app clipboard, not the system clipboard.
+let lessonClipboard=null;
+function refreshClipboardButtons(){
+  const slot=selected&&data.slots[key(selected.d,selected.p)];
+  $('copyLesson').disabled=!slot;
+  $('pasteLesson').disabled=!lessonClipboard;
+}
+const previousOpenModal=openModal;
+openModal=function(d,p){previousOpenModal(d,p);refreshClipboardButtons()};
+$('copyLesson').onclick=()=>{
+  if(!selected)return;
+  const slot=data.slots[key(selected.d,selected.p)];if(!slot)return;
+  const subject=data.subjects.find(s=>s.id===slot.subjectId);if(!subject)return;
+  lessonClipboard={subjectName:subject.name,subjectColor:subject.color,subjectAbbr:subject.abbr||'',subjectIcon:subject.icon||'',note:slot.note||''};
+  refreshClipboardButtons();notify('Unterrichtsstunde kopiert. Zielstunde öffnen und „Einfügen“ wählen.');
+};
+$('pasteLesson').onclick=()=>{
+  if(!selected||!lessonClipboard)return;
+  let subject=data.subjects.find(s=>s.name.toLowerCase()===lessonClipboard.subjectName.toLowerCase());
+  if(!subject){subject={id:'fach-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),name:lessonClipboard.subjectName,color:hexColor(lessonClipboard.subjectColor),abbr:lessonClipboard.subjectAbbr||'',icon:lessonClipboard.subjectIcon||''};data.subjects.push(subject)}
+  data.slots[key(selected.d,selected.p)]={subjectId:subject.id,note:lessonClipboard.note};
+  persist();render();closeModal();notify('Unterrichtsstunde eingefügt.');
+};
+// Opening another plan must not paste an invalid subject reference; the clipboard contains subject metadata.
+const existingTitleChange=$('planTitle').oninput;
+$('planTitle').oninput=e=>{existingTitleChange(e);renderPlanPicker()};
+const previousImport=importField.onchange;
+importField.onchange=async e=>{await previousImport(e);saveCollection();renderPlanPicker()};
+const previousLoad=$('loadBtn').onclick;
+$('loadBtn').onclick=()=>{previousLoad();saveCollection();renderPlanPicker()};
+
+// Tagesstatus: lokale Uhrzeit, inklusive freien Stunden und Pausen.
+const dateIndex=dt=>(dt.getDay()+6)%7;
+const minutesOf=hhmm=>{const parts=String(hhmm||'').split(':').map(Number);return parts.length===2&&parts.every(Number.isFinite)?parts[0]*60+parts[1]:NaN};
+const lessonLabel=(day,p)=>{const slot=data.slots[key(day,p)];const sub=slot&&data.subjects.find(x=>x.id===slot.subjectId);return sub?((sub.icon?sub.icon+' ':'')+(sub.abbr||sub.name)):'Freistunde'};
+function updateToday(){
+ const now=new Date(),day=dateIndex(now),mins=now.getHours()*60+now.getMinutes();
+ $('todayDate').textContent=new Intl.DateTimeFormat('de-DE',{weekday:'long',day:'2-digit',month:'long'}).format(now);
+ document.querySelectorAll('.current-lesson,.next-lesson').forEach(el=>el.classList.remove('current-lesson','next-lesson'));
+ const events=[];
+ if(day<data.days){
+  for(let p=0;p<data.periodCount;p++){
+   const start=minutesOf(data.times[p].start),end=minutesOf(data.times[p].end);
+   if(Number.isFinite(start)&&Number.isFinite(end)&&end>start)events.push({start,end,kind:'lesson',p,title:(p+1)+'. Stunde: '+lessonLabel(day,p),time:data.times[p].start+'–'+data.times[p].end});
+  }
+  for(const b of normalizedBreaks()){
+   const start=minutesOf(b.start),end=minutesOf(b.end);
+   if(Number.isFinite(start)&&Number.isFinite(end)&&end>start)events.push({start,end,kind:'break',title:'☕ '+b.name,time:b.start+'–'+b.end});
+  }
+  events.sort((a,b)=>a.start-b.start||a.end-b.end);
+ }
+ const current=events.find(e=>mins>=e.start&&mins<e.end),next=events.find(e=>e.start>mins);
+ $('nowLesson').textContent=current?.title||'Kein Unterricht';$('nowTime').textContent=current?.time||'–';
+ $('nextLesson').textContent=next?.title||'Keine weitere Stunde';$('nextTime').textContent=next?.time||'–';
+ $('todayMessage').textContent=day>=data.days?'Heute ist in diesem Stundenplan kein Schultag.':(!current&&!next?'Für heute ist der Unterricht beendet.':current?'Die aktuelle Unterrichtszeit ist hervorgehoben.':'Der nächste Unterricht beginnt später.');
+ for(const [event,cls] of [[current,'current-lesson'],[next,'next-lesson']]){
+  if(event?.kind!=='lesson')continue;
+  document.querySelector(`#schedule [data-drop-key="${key(day,event.p)}"]`)?.classList.add(cls);
+  document.querySelector(`#mobileLessons [data-drop-key="${key(day,event.p)}"]`)?.classList.add(cls);
+ }
+ $('jumpToday').disabled=day>=data.days;
+}
+$('jumpToday').onclick=()=>{const day=dateIndex(new Date());if(day<data.days){setActiveDay(day);$('mobileView').scrollIntoView({behavior:'smooth',block:'start'})}};
+const originalTodayRenderSchedule=renderSchedule;
+renderSchedule=function(){originalTodayRenderSchedule();updateToday()};
+const originalTodayMobile=renderMobileSchedule;
+renderMobileSchedule=function(){originalTodayMobile();updateToday()};
+activeDay=Math.min(dateIndex(new Date()),data.days-1);
+setInterval(updateToday,30000);
+
+render();renderPlanPicker();saveCollection();
+</script>
+<script>
+// Installation auf HTTPS-Domains; auf file:// keine Service Worker.
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(err => console.warn('Offline-Cache nicht aktiviert:', err)));
+}
+</script>
+</body></html>
